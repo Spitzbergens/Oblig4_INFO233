@@ -24,24 +24,24 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
 
 
     public SortedTreeMap(){
-
+        parent = null;
+        leftChild = null;
+        rightChild = null;
+        data = null;
+        size = 0;
     }
 
     public SortedTreeMap(Comparator<? super K> comparator) {
         this.comparator = comparator;
 
+
     }
 
 
 
-    public SortedTreeMap(Entry<K,V> data) {
-
+    public SortedTreeMap(Entry<K,V> data, SortedTreeMap<K,V> parent) {
         this.data = data;
-        parent = this;
-        size++;
-
-
-
+        this.parent = parent;
     }
 
     public SortedTreeMap(SortedTreeMap<K,V> parent, SortedTreeMap<K,V> rightChild,
@@ -94,45 +94,37 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public V add(K key, V value) {
-        SortedTreeMap<K,V> newNode = new SortedTreeMap<>(new Entry<>(key, value));
-
-        int compare = comparator.compare(newNode.data.key, parent.data.key);
-
-        if(parent == null) {
-            parent = newNode;
+        SortedTreeMap<K, V> newNode = new SortedTreeMap<>(new Entry<>(key, value), new SortedTreeMap<>());
+        if (parent == null) {
+            this.parent = newNode;
         }
-
-            // If current is smaller than new
-            if(compare < 0) {
-                if(parent.getRightChild() == null) {
-                    parent.setRightChild(newNode);
-                    newNode.setParent(parent);
+        // If current is smaller than new
+        SortedTreeMap<K,V> currentParent = parent;
+        if (currentParent.data.key.compareTo(newNode.data.key) < 0) {
+                if (currentParent.getRightChild() == null) {
+                    currentParent.rightChild = newNode;
+                    newNode.setParent(currentParent);
                 }
-                parent = parent.getRightChild();
+                currentParent= currentParent.getRightChild();
             }
+
             // If current is bigger than new
-            else if(compare > 0) {
-                if(parent.getLeftChild() == null) {
-                    parent.setLeftChild(newNode);
-                    newNode.setParent(parent);
+            else if (currentParent.data.key.compareTo(newNode.data.key) > 0) {
+                if (currentParent.getLeftChild() == null) {
+                    currentParent.leftChild = newNode;
+                    newNode.setParent(currentParent);
                 }
                 parent = parent.getLeftChild();
             }
             // If current is equal to new
-       // newNode.data.key.compareTo(parent.data.key)
-            else {
-                V oldValue = parent.data.value;
-                V newValue = value;
-
-
-
-
+            // newNode.data.key.compareTo(parent.data.key)
+            else if (currentParent.data.key.equals(newNode.data.key)) {
+                V oldValue = currentParent.data.value;
+                parent.data = newNode.data;
                 return oldValue;
             }
-
             size++;
         return null;
-
 
         }
 
@@ -389,6 +381,10 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
         }
 
         return this.parent.getLeftChild().getEntry(key);
+
+    }
+
+    private class Node<K,V>  {
 
     }
 

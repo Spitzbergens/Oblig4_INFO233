@@ -4,8 +4,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SortedTreeMapJunitTest {
 
+    private SortedTreeMap<Integer,String> map;
+    private Entry<Integer, String> entry;
+
     @org.junit.jupiter.api.BeforeEach
     void setUp() {
+
+        entry = new Entry<>(1, "test1");
+        map = new SortedTreeMap<>(entry, null);
 
     }
 
@@ -19,6 +25,10 @@ class SortedTreeMapJunitTest {
 
     @org.junit.jupiter.api.Test
     void add() {
+        Entry<Integer,String> value2 = new Entry<>(1, "test2");
+
+
+
 
     }
 
