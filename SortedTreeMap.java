@@ -42,11 +42,18 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public Entry<K, V> min() {
-       Node<K,V> currentNode = root;
-       while (currentNode.getRight() != null){
-           currentNode = currentNode.getRight();
-       }
-       return currentNode.getData();
+           if (!isEmpty()){
+               if (root.getLeft() == null){
+                   return root.getData();
+               }else{
+                   while (root.getLeft() != null){
+                          root = root.getLeft();
+                   }
+                   return root.data;
+               }
+           }else{
+               return null;
+           }
     }
 
 
@@ -57,11 +64,18 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public Entry<K, V> max() {
-        Node<K,V> currentNode = root;
-        if (currentNode.getLeft() != null){
-            currentNode = currentNode.getLeft();
+        if (!isEmpty()){
+            if (root.getRight() == null){
+                return root.getData();
+            }else{
+                while (root.getRight() != null){
+                        root = root.getRight();
+                }
+                return root.data;
+            }
+        }else{
+            return null;
         }
-        return currentNode.getData();
     }
 
 
@@ -134,6 +148,7 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
         V result = null;
         if (root == null){
             root = node;
+            size++;
         }else {
            result =  add(entry.key, entry.value);
         }
@@ -180,6 +195,8 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
     public V remove(Object key) throws NoSuchElementException {
         return null;
     }
+
+
 
     /**
      * Retrieves the value for the key in the map.
@@ -397,6 +414,14 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
 
         public void setRight(Node<K, V> right) {
             this.right = right;
+        }
+
+        public boolean hasLeft(){
+            return getLeft() != null;
+        }
+
+        public boolean hasRight(){
+            return getRight() != null;
         }
     }
 
