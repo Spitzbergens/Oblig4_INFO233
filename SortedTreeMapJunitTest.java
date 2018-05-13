@@ -10,8 +10,7 @@ class SortedTreeMapJunitTest {
     @org.junit.jupiter.api.BeforeEach
     void setUp() {
 
-        entry = new Entry<>(1, "test1");
-        map = new SortedTreeMap<>(entry, null);
+
 
     }
 

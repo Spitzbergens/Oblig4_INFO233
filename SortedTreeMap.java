@@ -17,39 +17,19 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
 
     private int size;
     private Entry<K,V> data;
-    private SortedTreeMap<K,V> parent, leftChild, rightChild;
+    private Node<K,V> root;
     private Comparator<? super K> comparator;
 
 
 
 
     public SortedTreeMap(){
-        parent = null;
-        leftChild = null;
-        rightChild = null;
         data = null;
         size = 0;
     }
 
     public SortedTreeMap(Comparator<? super K> comparator) {
         this.comparator = comparator;
-
-
-    }
-
-
-
-    public SortedTreeMap(Entry<K,V> data, SortedTreeMap<K,V> parent) {
-        this.data = data;
-        this.parent = parent;
-    }
-
-    public SortedTreeMap(SortedTreeMap<K,V> parent, SortedTreeMap<K,V> rightChild,
-                         SortedTreeMap<K,V> leftChild)
-    {
-        this.parent = parent;
-        this.rightChild = rightChild;
-        this.leftChild = leftChild;
     }
 
 
@@ -62,9 +42,9 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public Entry<K, V> min() {
-       SortedTreeMap<K,V> currentNode = parent;
-       while (currentNode.getRightChild() != null){
-           currentNode = currentNode.getRightChild();
+       Node<K,V> currentNode = root;
+       while (currentNode.getRight() != null){
+           currentNode = currentNode.getRight();
        }
        return currentNode.getData();
     }
@@ -77,9 +57,9 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public Entry<K, V> max() {
-        SortedTreeMap<K,V> currentNode = parent;
-        if (currentNode.getLeftChild() != null){
-            currentNode = currentNode.getLeftChild();
+        Node<K,V> currentNode = root;
+        if (currentNode.getLeft() != null){
+            currentNode = currentNode.getLeft();
         }
         return currentNode.getData();
     }
@@ -94,39 +74,48 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public V add(K key, V value) {
-        SortedTreeMap<K, V> newNode = new SortedTreeMap<>(new Entry<>(key, value), new SortedTreeMap<>());
-        if (parent == null) {
-            this.parent = newNode;
-        }
-        // If current is smaller than new
-        SortedTreeMap<K,V> currentParent = parent;
-        if (currentParent.data.key.compareTo(newNode.data.key) < 0) {
-                if (currentParent.getRightChild() == null) {
-                    currentParent.rightChild = newNode;
-                    newNode.setParent(currentParent);
-                }
-                currentParent= currentParent.getRightChild();
-            }
-
-            // If current is bigger than new
-            else if (currentParent.data.key.compareTo(newNode.data.key) > 0) {
-                if (currentParent.getLeftChild() == null) {
-                    currentParent.leftChild = newNode;
-                    newNode.setParent(currentParent);
-                }
-                parent = parent.getLeftChild();
-            }
-            // If current is equal to new
-            // newNode.data.key.compareTo(parent.data.key)
-            else if (currentParent.data.key.equals(newNode.data.key)) {
-                V oldValue = currentParent.data.value;
-                parent.data = newNode.data;
-                return oldValue;
-            }
+        Node<K,V> node = new Node<>(new Entry<>(key, value));
+        if (root == null) {
+            root = node;
             size++;
-        return null;
+            return null;
+        }else{
+            // If current is smaller than new
+            Node<K, V> currentParent = root;
+            while(true) {
+                if (currentParent.data.key.compareTo(node.data.key) < 0) {
+                    if (currentParent.getRight() == null) {
+                        currentParent.right = node;
+                        node.setParent(currentParent);
+                        size++;
+                        return null;
+                    }
+                    currentParent = currentParent.getRight();
+                }
+
+                // If current is bigger than new
+                else if (currentParent.data.key.compareTo(node.data.key) > 0) {
+                    if (currentParent.getLeft() == null) {
+                        currentParent.left = node;
+                        node.setParent(currentParent);
+                        size++;
+                        return null;
+                    }
+                    currentParent = currentParent.getLeft();
+                }
+
+                // If current is equal to new
+                // newNode.data.key.compareTo(parent.data.key)
+                if (currentParent.data.key.compareTo(node.data.key) == 0) {
+                    V oldValue = currentParent.data.value;
+                    currentParent.data = node.data;
+                    return oldValue;
+                }
+            }
 
         }
+
+    }
 
 
 
@@ -141,7 +130,8 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public V add(Entry<K, V> entry) {
-        return null;
+
+
     }
 
     /**
@@ -170,29 +160,7 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
 
     }
 
-    public SortedTreeMap<K, V> getParent() {
-        return parent;
-    }
 
-    public void setParent(SortedTreeMap<K, V> parent) {
-        this.parent = parent;
-    }
-
-    public SortedTreeMap<K, V> getLeftChild() {
-        return leftChild;
-    }
-
-    public void setLeftChild(SortedTreeMap<K, V> leftChild) {
-        this.leftChild = leftChild;
-    }
-
-    public SortedTreeMap<K, V> getRightChild() {
-        return rightChild;
-    }
-
-    public void setRightChild(SortedTreeMap<K, V> rightChild) {
-        this.rightChild = rightChild;
-    }
 
     /**
      * Removes the entry for key in the map. Throws an exception if the key is not present
@@ -227,7 +195,7 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public boolean containsKey(K key) {
-        return getEntry(key) != null;
+        return false;
     }
 
     /**
@@ -326,7 +294,7 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public boolean isEmpty() {
-        return size == 0 && parent == null;
+        return size == 0 && root == null;
     }
 
     /**
@@ -353,13 +321,13 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
     @Override
     public void clear() {
         if (!isEmpty()){
-            if (parent.getLeftChild() != null){
-                parent.setLeftChild(null);
+            if (root.getLeft() != null){
+                root.setLeft(null);
             }
-            if(parent.getRightChild() != null){
-                parent.setLeftChild(null);
-            }if (parent != null){
-                parent =null;
+            if(root.getRight() != null){
+                root.setLeft(null);
+            }if (root != null){
+                root =null;
             }
             setData(null);
             size = 0;
@@ -368,24 +336,62 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
     }
 
 
-    private K getEntry(K key){
-        if (this.parent == null){
-            return null;
-        }
-        K entryKey = data.key;
-        if (key.equals(entryKey)){
-            return entryKey;
-        }
-        if (key.compareTo(entryKey) < 0){
-            return this.parent.getLeftChild().getEntry(key);
-        }
 
-        return this.parent.getLeftChild().getEntry(key);
-
-    }
 
     private class Node<K,V>  {
 
+        private Entry<K,V> data;
+        private Node<K,V> parent;
+        private Node<K,V> left;
+        private Node<K,V> right;
+
+
+
+        public Node(){
+            this(null);
+        }
+
+        public Node(Entry<K,V> data){
+            this(data, null, null, null);
+        }
+
+        public Node(Entry<K,V> data, Node<K,V> left, Node<K,V> right, Node<K,V> parent){
+            this.data = data;
+            this.left = left;
+            this.right = right;
+        }
+
+        public Entry<K, V> getData() {
+            return data;
+        }
+
+        public Node<K, V> getParent() {
+            return parent;
+        }
+
+        public void setParent(Node<K, V> parent) {
+            this.parent = parent;
+        }
+
+        public void setData(Entry<K, V> data) {
+            this.data = data;
+        }
+
+        public Node<K, V> getLeft() {
+            return left;
+        }
+
+        public void setLeft(Node<K, V> left) {
+            this.left = left;
+        }
+
+        public Node<K, V> getRight() {
+            return right;
+        }
+
+        public void setRight(Node<K, V> right) {
+            this.right = right;
+        }
     }
 
 
