@@ -130,8 +130,14 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public V add(Entry<K, V> entry) {
-
-
+        Node<K,V> node = new Node<>(entry);
+        V result = null;
+        if (root == null){
+            root = node;
+        }else {
+           result =  add(entry.key, entry.value);
+        }
+        return result;
     }
 
     /**

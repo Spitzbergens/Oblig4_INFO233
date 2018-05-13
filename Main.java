@@ -21,13 +21,13 @@ public class Main {
 
         SortedTreeMap<Integer, String> map = new SortedTreeMap<>();
 
-        System.out.println(map.add(test.key, test.value));
-        map.add(test2.key, test2.value);
-        map.add(test3.key, test3.value);
-        map.add(test4.key, test4.value);
-        map.add(test5.key, test5.value);
-        map.add(test6.key, test6.value);
-        map.add(test7.key, test7.value);
+        map.add(test);
+        map.add(test2);
+        map.add(test3);
+        map.add(test4);
+        map.add(test5);
+        map.add(test6);
+
 
 
         System.out.println(map.size());
