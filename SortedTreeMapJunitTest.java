@@ -9,8 +9,10 @@ class SortedTreeMapJunitTest {
 
     @org.junit.jupiter.api.BeforeEach
     void setUp() {
-
-
+        Entry<Integer, String> test = new Entry<>(1, "En");
+        Entry<Integer, String> test2 = new Entry<>(1, "En");
+        Entry<Integer, String> test3 = new Entry<>(1, "En");
+        SortedTreeMap<Integer, String> map = new SortedTreeMap<>();
 
     }
 
@@ -24,7 +26,10 @@ class SortedTreeMapJunitTest {
 
     @org.junit.jupiter.api.Test
     void add() {
-        Entry<Integer,String> value2 = new Entry<>(1, "test2");
+
+        map.add(entry.key, entry.value);
+
+
 
 
 
