@@ -19,8 +19,7 @@ public class Main {
         map.add(test3);
 
 
-        System.out.println(map.min().key);
-        System.out.println(map.max().key);
+        System.out.println(map.entries());
 
 
 

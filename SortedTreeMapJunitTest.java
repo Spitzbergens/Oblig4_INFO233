@@ -1,5 +1,9 @@
 package no.uib.info233v18.oblig4;
 
+import org.junit.jupiter.api.Test;
+
+import java.util.Comparator;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class SortedTreeMapJunitTest {
@@ -26,14 +30,6 @@ class SortedTreeMapJunitTest {
 
     @org.junit.jupiter.api.Test
     void add() {
-
-        map.add(entry.key, entry.value);
-
-
-
-
-
-
     }
 
     @org.junit.jupiter.api.Test
@@ -46,6 +42,13 @@ class SortedTreeMapJunitTest {
 
     @org.junit.jupiter.api.Test
     void replace1() {
+
+
+    }
+
+    @Test
+    void RemoveIfReturnsEntry(){
+
     }
 
     @org.junit.jupiter.api.Test
