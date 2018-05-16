@@ -98,46 +98,81 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public V add(K key, V value) {
-        Node<K, V> node = new Node<>(new Entry<>(key, value));
-        if (root == null) {
-            root = node;
-            size++;
+        if(isEmpty()){ //if tree is empty
+            root = new Node<>(new Entry<>(key, value));
+            size = 1;
             return null;
-        } else {
-            // If current is smaller than new
-            Node<K, V> currentParent = root;
-            while (true) {
-                if (node.data.key.compareTo(currentParent.data.key) > 0) {
-                    if (currentParent.getRight() == null) {
-                        currentParent.right = node;
-                        node.setParent(currentParent);
-                        size++;
-                        return null;
-                    }
-                    currentParent = currentParent.getRight();
-                }
-
-                // If current is bigger than new
-                else if (node.data.key.compareTo(currentParent.data.key) < 0) {
-                    if (currentParent.getLeft() == null) {
-                        currentParent.left = node;
-                        node.setParent(currentParent);
-                        size++;
-                        return null;
-                    }
-                    currentParent = currentParent.getLeft();
-                }
-
-                // If current is equal to new
-                // newNode.data.key.compareTo(parent.data.key)
-                if (currentParent.data.key.compareTo(node.data.key) == 0) {
-                    V oldValue = currentParent.data.value;
-                    currentParent.data = node.data;
-                    return oldValue;
-                }
-            }
-
         }
+        Node<K, V> parent = root;
+        Node<K, V> oldParent = parent;
+        //check if key already exists
+        while(parent != null){
+            oldParent = parent;//the previous entry. parent will be null if key does not exist, and can't be used further
+            if(key.compareTo(parent.data.key)> 0){
+                parent = parent.right;
+            }
+            else if(key.compareTo(parent.data.key) < 0){
+                parent = parent.left;
+            }
+            else{
+                //the keys are the same!
+                V oldValue = parent.data.value;
+                Entry<K,V> tempEntry = new Entry<>(parent.data.key, value);
+                parent.setData(tempEntry);
+                return oldValue;
+            }
+        }
+        //key not found, insert new entry
+        Node<K,V> newNode = new Node<>(new Entry<>(key, value));
+        newNode.setParent(oldParent);
+
+        if (key.compareTo(oldParent.data.key) < 0)
+            oldParent.left = newNode;
+        else
+            oldParent.right = newNode;
+        size++;
+        return null;
+
+//        Node<K, V> node = new Node<>(new Entry<>(key, value));
+//        if (root == null) {
+//            root = node;
+//            size++;
+//            return null;
+//        } else {
+//            // If current is smaller than new
+//            Node<K, V> currentParent = root;
+//            while (true) {
+//                if (node.data.key.compareTo(currentParent.data.key) > 0) {
+//                    if (currentParent.getRight() == null) {
+//                        currentParent.right = node;
+//                        node.setParent(currentParent);
+//                        size++;
+//                        return null;
+//                    }
+//                    currentParent = currentParent.getRight();
+//                }
+//
+//                // If current is bigger than new
+//                else if (node.data.key.compareTo(currentParent.data.key) < 0) {
+//                    if (currentParent.getLeft() == null) {
+//                        currentParent.left = node;
+//                        node.setParent(currentParent);
+//                        size++;
+//                        return null;
+//                    }
+//                    currentParent = currentParent.getLeft();
+//                }
+//
+//                // If current is equal to new
+//                // newNode.data.key.compareTo(parent.data.key)
+//                if (currentParent.data.key.compareTo(node.data.key) == 0) {
+//                    V oldValue = currentParent.data.value;
+//                    currentParent.data = node.data;
+//                    return oldValue;
+//                }
+//            }
+//
+//        }
 
     }
 
@@ -214,58 +249,114 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
     @Override
     public V remove(Object key) throws NoSuchElementException {
 
-        Node<K,V> result = getEntry((K)key, root);
-        root = remove(root, (K)key);
+        Node<K,V> node = root;
+        while(node != null){
+
+            if(((K) key).compareTo(node.data.key) > 0){
+                node = node.right;
+            }
+            else if(((K) key).compareTo(node.data.key) < 0){
+                node = node.left;
+            }
+            else{
+                break;
+            }
+        }
+        if(node == null){
+            throw new NoSuchElementException();
+        }
+        V oldValue = node.data.value;
+
+        //if in the middle of the tree
+        if(node.left != null && node.right != null){
+            Node<K,V> minEntry = node.right;
+            //finding the smallest entry to the right
+            while(minEntry.left != null){
+                minEntry = minEntry.left;
+            }
+            //replace entry with minEntry
+            node.setData(new Entry<>(minEntry.data.key, minEntry.data.value));
+            node = minEntry;
+        }
+
+        Node<K,V> repNode; //the entry that should replace the removed entry
+        if(node.left != null) repNode = node.left;
+        else repNode = node.right;
+
+        if(repNode != null){
+            repNode.parent = node.parent;
+            if(node.parent == null)
+                root = repNode;
+            else if(node == node.parent.left)
+                node.parent.left = repNode;
+            else
+                node.parent.right = repNode;
+        }
+        else if(node.parent == null){
+            //if the entry is the root
+            root = null;
+        }
+        else{
+            //if we are at a leaf node...
+            //is the entry to the right or left of its parent
+            if(node == node.parent.left)
+                node.parent.left = null;
+            else if(node == node.parent.right)
+                node.parent.right = null;
+            //unlink entry from the parent
+            node.parent = null;
+        }
         size--;
-        return result.data.value;
+        return oldValue;
+
+//        Node<K,V> result = getEntry((K)key, root);
+//        root = remove(root, (K)key);
+//        size--;
+//        return result.data.value;
 
     }
 
 
     public Node<K,V> remove(Node<K, V> node, K key) {
 
-                if (node == null){
+        if (node == null) {
             return null;
         }
 
-        if (node.left == null && node.right == null) {
-            node = null;
-        }else if (node.parent == null){
-            node = null;
-        }
-        else {
 
-            if (node.data.key.compareTo(key) < 0) {
-                node.left = remove(node.left, key);
-            } else if (node.data.key.compareTo(key) > 0) {
-                node.right = remove(node.right, key);
-            } else {
-                if (node.left != null && node.right != null) {
-                    Node<K, V> left = node.left;
-                    Node<K, V> right = node.right;
+        if (node.getData().key.compareTo(key) < 0) {
+            node.setLeft(remove(node.getLeft(), key));
+        } else if (node.getData().key.compareTo(key) > 0) {
+            node.setLeft(remove(node.getRight(), key));
 
-                    node = removeMin(node.right, node);
+        } else {
+            if (node.getLeft() != null && node.getRight() != null) {
+                Node<K, V> left = node.getLeft();
+                Node<K, V> right = node.getRight();
 
-                    Node<K, V> minRight = node.right;
+                node = removeMin(node.getRight(), node);
 
-                    node.left = left;
-                    node.right = right;
+                Node<K, V> minRight = node.getRight();
 
-                    if (node.right.data == node.data) {
-                        node.right = minRight;
-                    }
-                } else if (node.left == null && node.right == null) {
-                    node = null;
-                } else if (node.left != null) {
-                    node = node.left;
-                } else {
-                    node = node.right;
+                node.setLeft(left);
+                node.setRight(right);
+
+                Node<K,V> rightTemp = node.getRight();
+                if (rightTemp.getData() == node.getData()) {
+                    node.setRight(minRight);
                 }
+            } else if (node.getLeft() == null && node.getRight() == null) {
+                node = null;
+            } else if (node.getLeft() != null) {
+                node = node.getLeft();
+            } else {
+                node = node.getRight();
             }
         }
-            return node;
 
+        return node;
     }
+
 
 
 
@@ -425,7 +516,59 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public Entry<K, V> higherOrEqualEntry(K key) {
+        Iterator<Entry<K, V>> entries = entries().iterator();
+        Entry<K, V> current;
+
+        while(entries.hasNext()) {
+            current = entries.next();
+            if(current.key.compareTo(key) == 0) {
+                return current;
+            } else if(current.key.compareTo(key) > 0) {
+                return current;
+            }
+        }
         return null;
+//
+//        Node<K, V> entry = root;
+//        if(isEmpty()){
+//            return null;
+//        }
+//        while(entry != null){
+//            //the key is smaller
+//            if(key.compareTo(entry.getData().key) < 0){
+//                //if there are no keys smaller than current entry
+//                if(entry.left == null) {
+//                    return entry.getData();
+//                }
+//                //else continue looping
+//                entry = entry.left;
+//            }
+//            //the key is larger
+//            else if(key.compareTo(entry.getData().key) > 0){
+//                //if there are no keys larger than the current entry
+//                if(entry.getRight() == null) {
+//                    //iterate backwards, so long as the child entry is right of the parent (larger)
+//                    Node<K, V> parent = entry.parent;
+//                    Node<K,V> child = entry;
+//                   if (parent != null && child == parent.getRight()){
+//
+//                       parent.setParent(child);
+//                        child.setRight(parent);
+//                        parent = parent.parent;
+//                       return parent.data;
+//                    }
+//
+//                }
+//                //else continue looping
+//                entry = entry.right;
+//            }
+//            //the key is equal!
+//            else{
+//                return entry.data;
+//            }
+//        }
+//        //could not find anything equal or lower
+//        return null;
 
     }
 
@@ -440,7 +583,26 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public Entry<K, V> lowerOrEqualEntry(K key) {
-        return null;
+        Iterator<Entry<K, V>> entries = entries().iterator();
+        Entry<K, V> curr;
+        Entry<K, V> toReturn = null;
+
+        while(entries.hasNext()) {
+            curr = entries.next();
+            if(curr.key.compareTo(key) == 0) {
+                return curr;
+            }
+            if(curr.key.compareTo(key) < 0) {
+                if(toReturn == null) {
+                    toReturn = curr;
+                }
+                if(curr.key.compareTo(toReturn.key) > 0) {
+                    toReturn = curr;
+                }
+            }
+        }
+        return toReturn;
+
     }
 
     /**

@@ -17,9 +17,13 @@ public class Main {
         map.add(test);
         map.add(test2);
         map.add(test3);
+        map.add(test4);
+        map.add(test5);
 
 
-        System.out.println(map.entries());
+
+
+        System.out.println(map.higherOrEqualEntry(9).value);
 
 
 
